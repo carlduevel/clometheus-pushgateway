@@ -1,4 +1,4 @@
-(defproject clometheus-pushgateway "0.1.0-SNAPSHOT"
+(defproject clometheus-pushgateway "0.1.0"
   :description "Pushgateway library for clometheus"
   :url "https://github.com/carlduevel/clometheus-pushgateway"
   :license {:name "Apache License 2.0"
