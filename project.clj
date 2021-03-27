@@ -8,4 +8,5 @@
                  [org.clojure/tools.logging "1.1.0"]
                  [overtone/at-at "1.2.0"]
                  [clj-http "3.10.0"]]
+  :lein-release {:deploy-via :clojars}
   :profiles {:dev {:plugins [[lein-release/lein-release "1.0.9"]]}})
