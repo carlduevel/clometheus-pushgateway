@@ -13,5 +13,5 @@
     (with-redefs
       [http/post (fn[& args] (is (= args expected)) )
        at/every  (constantly nil )]
-      (sut/start-pushgateway-reporter! "my-host" "my-job"))))
+      (is (= nil (sut/start-pushgateway-reporter! "my-host" "my-job"))))))
 

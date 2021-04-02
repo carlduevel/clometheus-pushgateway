@@ -23,15 +23,21 @@
        (catch Exception e
          (log/error e "Exception caught in scheduled job."))))
 
-(defn start-pushgateway-reporter! [host-name job-name &
-                                  {interval-ms :interval-ms registry :registry :or {interval-ms 15000 registry c/default-registry}}]
+(defn start-pushgateway-reporter!
+  "Pushes metrics once and then schedules a job to do it regularly.
+   Metrics are pushed a last time on shutdown, so no updates are lost.
+   Returns a scheduled-fn in case the client wants to cancel it later on.
+   Example usage:
+   ```clojure
+   (start-pushgateway-reporter! \"my-host.my-org.com\" \"my-batch-job-name\")
+   ```
+  "
+  [host-name job-name &
+   {interval-ms :interval-ms registry :registry :or {interval-ms 15000 registry c/default-registry}}]
   (let [push (partial push registry host-name job-name)]
     (push)
-    ;; TODO return job
-    (at/every  interval-ms (partial exception-to-log push) (at/mk-pool)
-               :initial-delay interval-ms :desc "Push Gateway")
-    (.addShutdownHook (Runtime/getRuntime) (Thread. ^Runnable (partial exception-to-log push)))
-    (log/info "Push Gateway started")))
-
-
-
+    (let [schedueled-fn (at/every  interval-ms (partial exception-to-log push) (at/mk-pool)
+                                   :initial-delay interval-ms :desc "Push Gateway")]
+      (.addShutdownHook (Runtime/getRuntime) (Thread. ^Runnable (partial exception-to-log push)))
+      (log/info "Push Gateway started")
+      schedueled-fn)))
